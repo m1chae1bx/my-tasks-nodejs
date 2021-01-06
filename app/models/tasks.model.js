@@ -1,7 +1,8 @@
 module.exports = mongoose => {
     var schema = mongoose.Schema(
         {
-          name: String,
+          name: { type: String},
+          completed: { type: Boolean, default: false }
         },
         { timestamps: true }
     );

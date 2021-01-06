@@ -30,19 +30,22 @@ exports.create = (req, res) => {
 
 // Retrieve all Tasks from the database.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-  var condition = name ? { name: { $regex: new RegExp(name), $options: "i"} } : {};
+    const name = req.query.name;
+    const completed = req.query.completed;
+    var condition = {};
+    if (name) condition = {name: { $regex: new RegExp(name), $options: "i"}};
+    if (completed != null) condition = {...condition, completed: completed}
 
-  Task.find(condition)
-    .then(data => {
-        res.send(data);
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: 
-                err.message || "Some error occurred while retrieving tasks."
+    Task.find(condition)
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: 
+                    err.message || "Some error occurred while retrieving tasks."
+            });
         });
-    });
 };
 
 // Find a single Task with an id

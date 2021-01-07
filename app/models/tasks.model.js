@@ -2,7 +2,8 @@ module.exports = mongoose => {
     var schema = mongoose.Schema(
         {
           name: { type: String},
-          completed: { type: Boolean, default: false }
+          completed: { type: Boolean, default: false },
+          dueDate: {type: Date, default: null}
         },
         { timestamps: true }
     );

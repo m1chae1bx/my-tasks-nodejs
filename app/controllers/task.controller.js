@@ -1,4 +1,3 @@
-const { response } = require("express");
 const db = require("../models");
 const Task = db.tasks;
 
@@ -12,7 +11,8 @@ exports.create = (req, res) => {
 
     // Create a Task
     const task = new Task({
-        name: req.body.name
+        name: req.body.name,
+        dueDate: req.body.dueDate
     });
 
     task
@@ -28,15 +28,30 @@ exports.create = (req, res) => {
         });
 };
 
-// Retrieve all Tasks from the database.
-exports.findAll = (req, res) => {
+// Retrieve tasks from the database.
+exports.find = (req, res) => {
     const name = req.query.name;
     const completed = req.query.completed;
-    var condition = {};
-    if (name) condition = {name: { $regex: new RegExp(name), $options: "i"}};
-    if (completed != null) condition = {...condition, completed: completed}
+    const dueDate = req.query.dueDate;
+    var date = new Date(req.query.today);
+    var query = {};
+    if (name) query = {name: { $regex: new RegExp(name), $options: "i"}};
+    if (completed != null) query = {...query, completed: completed}
+    if (dueDate === 'today') {
+        query = {...query, dueDate: { $eq: date}}
+    } else if (dueDate === 'tomorrow') {
+        date.setDate(date.getDate() + 1);
+        query = {...query, dueDate: { $eq: date}}
+    } else if (dueDate === 'upcoming') {
+        date.setDate(date.getDate() + 1);
+        query = {...query, dueDate: { $gt: date}}
+    } else if (dueDate === 'overdue') {
+        query = {...query, dueDate: { $lt: date}}
+    } else if (dueDate === 'unplanned') {
+        query = {...query, dueDate: null}
+    }
 
-    Task.find(condition)
+    Task.find(query)
         .then(data => {
             res.send(data);
         })

@@ -12,7 +12,8 @@ exports.create = (req, res) => {
     // Create a Task
     const task = new Task({
         name: req.body.name,
-        dueDate: req.body.dueDate
+        dueDate: req.body.dueDate,
+        desc: req.body.desc
     });
 
     task

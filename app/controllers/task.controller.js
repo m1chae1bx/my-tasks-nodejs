@@ -36,20 +36,25 @@ exports.find = (req, res) => {
     const dueDate = req.query.dueDate;
     var date = new Date(req.query.today);
     var query = {};
-    if (name) query = {name: { $regex: new RegExp(name), $options: "i"}};
-    if (completed != null) query = {...query, completed: completed}
+    if (name) query = { 
+        $text: {
+            $search: name,
+            $language: 'en'
+        }
+    };
+    if (completed != null) query = { ...query, completed: completed }
     if (dueDate === 'today') {
-        query = {...query, dueDate: { $eq: date}}
+        query = { ...query, dueDate: { $eq: date } }
     } else if (dueDate === 'tomorrow') {
         date.setDate(date.getDate() + 1);
-        query = {...query, dueDate: { $eq: date}}
+        query = { ...query, dueDate: { $eq: date } }
     } else if (dueDate === 'upcoming') {
         date.setDate(date.getDate() + 1);
-        query = {...query, dueDate: { $gt: date}}
+        query = { ...query, dueDate: { $gt: date } }
     } else if (dueDate === 'overdue') {
-        query = {...query, dueDate: { $lt: date}}
+        query = { ...query, dueDate: { $lt: date } }
     } else if (dueDate === 'unplanned') {
-        query = {...query, dueDate: null}
+        query = { ...query, dueDate: null }
     }
 
     Task.find(query)
@@ -92,7 +97,7 @@ exports.update = (req, res) => {
 
   const id = req.params.id;
 
-  Task.findByIdAndUpdate(id, req.body, {useFindAndModify: false })
+  Task.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
     .then(data => {
         if (!data) {
             res.status(404).send({

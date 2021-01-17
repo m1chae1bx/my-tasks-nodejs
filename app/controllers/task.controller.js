@@ -42,7 +42,7 @@ exports.find = (req, res) => {
             $language: 'en'
         }
     };
-    if (completed != null) query = { ...query, completed: completed }
+    if (completed != null) query = { ...query, completed: JSON.parse(completed) }
     if (dueDate === 'today') {
         query = { ...query, dueDate: { $eq: date } }
     } else if (dueDate === 'tomorrow') {
@@ -57,16 +57,24 @@ exports.find = (req, res) => {
         query = { ...query, dueDate: null }
     }
 
-    Task.find(query)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: 
-                    err.message || "Some error occurred while retrieving tasks."
-            });
+    Task.aggregate([
+        { $match: query },
+        { $addFields: 
+            { 
+                hasValue : { $cond: [ { $eq: [ "$dueDate", null ] }, 1, 2 ] },
+            }
+        },
+    ])
+    .sort({ hasValue: -1, dueDate: 1 })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: 
+                err.message || "Some error occurred while retrieving tasks."
         });
+    });
 };
 
 // Find a single Task with an id

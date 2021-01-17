@@ -10,11 +10,12 @@ module.exports = mongoose => {
     );
     
     schema.index({ name: 'text'}, { default_language: 'english' });
-    schema.method("toJSON", function() {
-        const {__v, _id, ...object} = this.toObject();
-        object.id = _id;
-        return object;
-    });
+    
+    // schema.method("toJSON", function() {
+    //     const {__v, _id, ...object} = this.toObject();
+    //     object.id = _id;
+    //     return object;
+    // });  // doesn't work on aggregation
 
     mongoose.set('useCreateIndex', true);
 

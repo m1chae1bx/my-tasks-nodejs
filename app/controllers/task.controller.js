@@ -31,17 +31,24 @@ exports.create = (req, res) => {
 
 // Retrieve tasks from the database.
 exports.find = (req, res) => {
+    const id = req.query.id
     const name = req.query.name;
     const completed = req.query.completed;
     const dueDate = req.query.dueDate;
     var date = new Date(req.query.today);
     var query = {};
-    if (name) query = { 
-        $text: {
-            $search: name,
-            $language: 'en'
-        }
-    };
+
+    /* Search using text index, might  be useful in the future */
+    // if (name) query = { 
+    //     $text: {
+    //         $search: name,
+    //         $language: 'en'
+    //     }
+    // };
+
+    if (id) query = {_id: db.mongoose.Types.ObjectId(id)};
+    if (name) query = {...query, name: { $regex: new RegExp(name), $options: "i"}};
+    // if (name) query = {name: '%' + name + '%'};
     if (completed != null) query = { ...query, completed: JSON.parse(completed) }
     if (dueDate === 'today') {
         query = { ...query, dueDate: { $eq: date } }

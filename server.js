@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const passport = require('passport');
 
 const app = express();
 
@@ -30,12 +31,23 @@ db.mongoose
         process.exit();
     });
 
+const passportConfig = require('./app/config/passport.config');
+app.use(passport.initialize());
+
 // simple route
 app.get("/", (req, res) => {
     res.json({ message: "Jesus is Lord and Savior." });
 });
 
 require("./app/routes/tasks.routes")(app);
+require("./app/routes/auth.routes")(app);
+
+app.use(function(err, req, res, next) {
+    if (err.name = "UnauthorizedError") {
+        res.status(401);
+        res.json({"message": err.name + ": " + err.message});
+    }
+});
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

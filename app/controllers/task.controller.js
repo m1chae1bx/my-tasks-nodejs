@@ -3,6 +3,15 @@ const Task = db.tasks;
 
 // Create and Save a new Task
 exports.create = (req, res) => {
+
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
+        });
+        return;
+    } 
+
     // Validate request
     if (!req.body.name) {
         res.status(400).send({ message: "Content can not be empty"});
@@ -37,6 +46,14 @@ exports.find = (req, res) => {
     const dueDate = req.query.dueDate;
     var date = new Date(req.query.today);
     var query = {};
+
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
+        });
+        return;
+    }
 
     /* Search using text index, might  be useful in the future */
     // if (name) query = { 
@@ -88,6 +105,14 @@ exports.find = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
+        });
+        return;
+    }
+
     Task.findById(id)
         .then(data => {
             if (!data)
@@ -104,15 +129,24 @@ exports.findOne = (req, res) => {
 
 // Update a Task by the id in the request
 exports.update = (req, res) => {
-  if (!req.body) {
-      return res.status(400).send({
-          message: "Data to update cannot be empty!"
-      });
-  }
 
-  const id = req.params.id;
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
+        });
+        return;
+    }
 
-  Task.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Data to update cannot be empty!"
+        });
+    }
+
+    const id = req.params.id;
+
+    Task.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
     .then(data => {
         if (!data) {
             res.status(404).send({
@@ -129,38 +163,54 @@ exports.update = (req, res) => {
 
 // Delete a Task with the specified id in the request
 exports.delete = (req, res) => {
-  const id = req.params.id;
+    const id = req.params.id;
 
-  Task.findByIdAndRemove(id)
-    .then(data => {
-        if (!data) {
-            res.status(404).send({
-                message: `Cannot update Task with id ${id}. Maybe Task was not found!`
-            });
-        } else {
-            res.send({
-                message: "Task was deleted successfully!"
-            });
-        }
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: "Error deleting Task with id " + id
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
         });
-    }); 
+        return;
+    }
+
+    Task.findByIdAndRemove(id)
+        .then(data => {
+            if (!data) {
+                res.status(404).send({
+                    message: `Cannot update Task with id ${id}. Maybe Task was not found!`
+                });
+            } else {
+                res.send({
+                    message: "Task was deleted successfully!"
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error deleting Task with id " + id
+            });
+        }); 
 };
 
 // Delete all Tasks from the database.
-exports.deleteAll = (req, res) => {
-  Task.deleteMany({})
-    .then(data => {
-        res.send({
-            message: `${data.deletedCount} Tasks were deleted successfully!`
+exports.deleteAll = (req, res) => { // @todo remove if not necessary, potential risk
+    // If no user ID exists in the JWT return a 401
+    if (!req.payload._id) {
+        res.status(401).json({
+            "message" : "UnauthorizedError: private data"
         });
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: err.message || "An error occurred while removing all tasks."
+        return;
+    }
+
+    Task.deleteMany({})
+        .then(data => {
+            res.send({
+                message: `${data.deletedCount} Tasks were deleted successfully!`
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "An error occurred while removing all tasks."
+            });
         });
-    });
 };

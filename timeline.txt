@@ -1,0 +1,13 @@
+29-May
+
+https://www.sitepoint.com/user-authentication-mean-stack/
+
+To create the JSON Web Token, use the jsonwebtoken library
+Run npm install jsonwebtoken --save
+
+We will use passport to simplify the process of authentication
+Run npm install passport --save
+Run nmp install passport-local --save
+
+For route authentication
+Run npm install express-jwt --save

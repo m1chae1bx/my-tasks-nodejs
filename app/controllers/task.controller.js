@@ -177,7 +177,7 @@ exports.delete = (req, res) => {
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot update Task with id ${id}. Maybe Task was not found!`
+                    message: `Cannot delete Task with id ${id}. Task was not found!`
                 });
             } else {
                 res.send({

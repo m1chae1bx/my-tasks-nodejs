@@ -40,7 +40,7 @@ exports.register = function(req, res) {
         if (users[0].email === email) {
           return res.status(409).send({ message: "Email address already registered", code: 'emailUnavailable'});
         } else {
-          return res.status(409).send({ message: "Username already in use", code: 'usernameUnavailable'});
+          return res.status(409).send({ message: "Username already taken", code: 'usernameUnavailable'});
         }
       } else {
         newUser.email = email;
@@ -112,15 +112,58 @@ exports.getUserDetails = function(req,res) {
     });
 };
 
-// @todo: Implement delete user
-// exports.delete = function(req, res) {
-//   const id = req.params.id;
-//
-//   // If no user ID exists in the JWT return a 401
-//   if (!req.payload._id) {
-//     res.status(401).json({
-//       "message" : "UnauthorizedError: private data"
-//     });
-//     return;
-//   }
-// }
+exports.delete = function(req, res) {
+  const id = req.params.id;
+  const password = req.body.password;  
+
+  // If no user ID exists in the JWT return a 401
+  if (!req.payload._id) {
+    res.status(401).json({
+      "message" : "UnauthorizedError: private data"
+    });
+    return;
+  }
+
+  // Require password
+  if (!password) {
+    res.status(400).send({message: 'Password is required'});
+  }
+
+  // Find user
+  User.findById(id)
+    .then(user => {
+      if (!user)
+        res.status(404).send({ message: "User with id " + id + "not found"});
+      else {
+        // Validate password
+        if (!user.validPassword(password)) {
+          res.status(401).send({message:" Password is incorrect", code: "pass"});
+        } else {
+          // If password is valid, delete user
+          User.deleteOne({_id: db.mongoose.Types.ObjectId(id)})
+            .then(data => {
+              if (!data) {
+                res.status(404).send({
+                    message: `Cannot delete User with id ${id}. User was not found!`
+                });
+              } else {
+                res.send({
+                    message: "User was deleted successfully!"
+                });
+              }
+            })
+            .catch(err => {
+              res.status(500).send({
+                  message: "Error deleting User with id " + id
+              });
+            }); 
+        }
+      }
+    })
+    .catch(err => {
+      console.log('error');
+      res
+        .status(500)
+        .send({ message: "Error retrieving User with id " + id });
+    });
+}

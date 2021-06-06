@@ -15,8 +15,11 @@ module.exports = app => {
   // Login
   router.post("/login", authController.login);
 
-  // Get User Details by ID
+  // Get user details by ID
   router.get("/user/:id", auth, authController.getUserDetails);
   
+  // Delete user by ID
+  router.delete('/user/:id', auth, authController.delete);
+
   app.use('/api', router);
 }

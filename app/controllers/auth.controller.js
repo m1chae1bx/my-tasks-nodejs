@@ -1,3 +1,4 @@
+const { authenticate } = require('passport');
 var passport = require('passport');
 const db = require("../models");
 const User = db.users;
@@ -167,3 +168,54 @@ exports.delete = function(req, res) {
         .send({ message: "Error retrieving User with id " + id });
     });
 }
+
+exports.update = (req, res) => {
+  
+  // @todo verify if this step is really necessary since we are already authenticating in the route
+  // If no user ID exists in the JWT return a 401
+  if (!req.payload._id) {
+    res.status(401).json({
+      message : 'UnauthorizedError: private data'
+    });
+    return;
+  }
+
+  if (!req.body) {
+    return res.status(400).send({
+      message: 'Data to update cannot be empty'
+    })
+  }
+
+  /** Clean */
+  const fullName = req.body.fullName?.trim();
+  const nickname = req.body.nickname?.trim();
+
+  /** Check if any required field is missing */
+  if (
+    !fullName ||
+    !nickname
+  ) {
+    return res.status(400).send({ message: "A required field is missing", code: 'missingField'});
+  }
+
+  const id = req.params.id;
+  const newData = {
+    fullname: fullName,
+    nickname: nickname
+  }
+
+  User.findByIdAndUpdate(id, newData, { useFindAndModify: false})
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update User with id ${id}. Maybe User was not found!`
+        });
+      } else 
+        res.send({message: "User was updated successfully"});
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating User with id " + id
+      });
+    });
+};

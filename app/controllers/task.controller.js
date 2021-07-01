@@ -5,7 +5,7 @@ const Task = db.tasks;
 exports.create = (req, res) => {
 
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });
@@ -26,7 +26,7 @@ exports.create = (req, res) => {
     });
 
     task
-        .save(task)
+        .save()
         .then(data => {
             res.send(data);
         })
@@ -48,7 +48,7 @@ exports.find = (req, res) => {
     var query = {};
 
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });
@@ -90,8 +90,10 @@ exports.find = (req, res) => {
         },
     ])
     .sort({ hasValue: -1, dueDate: 1 })
-    .then(data => {
-        res.send(data);
+    .then(tasks => {
+        res.send(tasks.map(item => {
+            return new Task(item);
+        }));
     })
     .catch(err => {
         res.status(500).send({
@@ -106,7 +108,7 @@ exports.findOne = (req, res) => {
     const id = req.params.id;
 
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });
@@ -118,7 +120,7 @@ exports.findOne = (req, res) => {
             if (!data)
                 res.status(404).send({ message: "Not found Task with id " + id });
             else
-                res.send(data);
+                res.send(new Task(data));
         })
         .catch(err => {
             res
@@ -131,7 +133,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
 
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });
@@ -166,7 +168,7 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });
@@ -195,7 +197,7 @@ exports.delete = (req, res) => {
 // Delete all Tasks from the database.
 exports.deleteAll = (req, res) => { // @todo remove if not necessary, potential risk
     // If no user ID exists in the JWT return a 401
-    if (!req.payload._id) {
+    if (!req.payload.id) {
         res.status(401).json({
             "message" : "UnauthorizedError: private data"
         });

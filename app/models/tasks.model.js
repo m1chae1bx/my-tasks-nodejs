@@ -6,7 +6,21 @@ module.exports = mongoose => {
           dueDate: { type: Date, default: null },
           desc: { type: String, default: null }
         },
-        { timestamps: true }
+        { 
+          timestamps: true,
+          toObject: {
+            getters: true,
+            transform: function (doc, ret) {
+              delete ret._id;
+            }
+          },
+          toJSON: {
+            getters: true,
+            transform: function (doc, ret) {
+              delete ret._id;
+            }
+          }
+        }
     );
 
     mongoose.set('useCreateIndex', true);

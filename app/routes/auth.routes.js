@@ -10,10 +10,10 @@ module.exports = app => {
   var router = require("express").Router();
 
   // Create a new account
-  router.post("/register", authController.register);
+  router.post("/auth/register", authController.register);
 
   // Login
-  router.post("/login", authController.login);
+  router.post("/auth/login", authController.login);
 
   // Get user details by ID
   router.get("/user/:id", auth, authController.getUserDetails);

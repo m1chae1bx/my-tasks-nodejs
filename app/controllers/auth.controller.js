@@ -46,7 +46,7 @@ exports.register = function(req, res) {
       } else {
         newUser.email = email;
         newUser.username = username;
-        newUser.fullname = fullName;
+        newUser.fullName = fullName;
         newUser.nickname = nickname;
 
         newUser.setPassword(password);
@@ -92,7 +92,7 @@ exports.getUserDetails = function(req,res) {
   const id = req.params.id;
 
   // If no user ID exists in the JWT return a 401
-  if (!req.payload._id) {
+  if (!req.payload.id) {
     res.status(401).json({
       "message" : "UnauthorizedError: private data"
     });
@@ -118,7 +118,7 @@ exports.delete = function(req, res) {
   const password = req.body.password;  
 
   // If no user ID exists in the JWT return a 401
-  if (!req.payload._id) {
+  if (!req.payload.id) {
     res.status(401).json({
       "message" : "UnauthorizedError: private data"
     });
@@ -173,7 +173,7 @@ exports.update = (req, res) => {
   
   // @todo verify if this step is really necessary since we are already authenticating in the route
   // If no user ID exists in the JWT return a 401
-  if (!req.payload._id) {
+  if (!req.payload.id) {
     res.status(401).json({
       message : 'UnauthorizedError: private data'
     });
@@ -200,7 +200,7 @@ exports.update = (req, res) => {
 
   const id = req.params.id;
   const newData = {
-    fullname: fullName,
+    fullName: fullName,
     nickname: nickname
   }
 

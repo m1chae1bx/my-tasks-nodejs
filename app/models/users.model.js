@@ -13,7 +13,7 @@ module.exports = mongoose => {
       unique: true,
       required: true
     },
-    fullname: {
+    fullName: {
       type: String,
       required: true
     },
@@ -42,7 +42,7 @@ module.exports = mongoose => {
     expiry.setDate(expiry.getDate() + 7);
 
     return jwt.sign({
-      _id: this._id,
+      id: this.id,
       email: this.email,
       username: this.username,
       exp: parseInt(expiry.getTime() / 1000)

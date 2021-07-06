@@ -1,5 +1,5 @@
 const db = require("../models");
-const Task = db.tasks;
+const Task = db.Task;
 
 // Create and save a new task
 exports.create = (req, res) => {

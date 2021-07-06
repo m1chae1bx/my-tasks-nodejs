@@ -1,19 +1,19 @@
 const passport = require('passport');
 const db = require("../models");
-const User = db.users;
-// const List = db.list;
+const User = db.User;
+const List = db.List;
 
-// const initializeUser = async function(user) {
-//   // Create a default list
-//   const list = new List({
-//     name: 'Default',
-//     owner: user._id
-//   });
+const initializeUser = async function(user) {
+  // Create a default list
+  const list = new List({
+    name: 'Default',
+    owner: user._id
+  });
 
-//   // No error handling as to to interrupt user creation
-//   // If no list was created, it can be created at a later stage
-//   await list.save();
-// };
+  // No error handling as to to interrupt user creation
+  // If no list was created, it can be created at a later stage
+  await list.save();
+};
 
 exports.register = function(req, res) {
   // Clean
@@ -73,7 +73,7 @@ exports.register = function(req, res) {
         newUser
           .save()
           .then(() => {
-            // initializeUser(newUser);
+            initializeUser(newUser);
             var token = newUser.generateJwt();
             res.status(200).json({ "token": token });
           })

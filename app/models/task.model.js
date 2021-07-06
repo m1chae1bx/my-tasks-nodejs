@@ -23,8 +23,6 @@ module.exports = mongoose => {
         }
     );
 
-    mongoose.set('useCreateIndex', true);
-
     const Task = mongoose.model("task", schema);
     return Task;
   };

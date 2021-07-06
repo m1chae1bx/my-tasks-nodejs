@@ -1,56 +1,48 @@
+// Initialize express application
 const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const passport = require('passport');
-
 const app = express();
+app.use(express.json()); // parse requests of content-type - application/json
+app.use(express.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
 
+// Configure origin from which requests are permitted using cors
 var corsOptions = {
-    origin: "http://localhost:4200"
+  origin: "http://localhost:4200"
 };
+const cors = require("cors");
+app.use(cors(corsOptions)); 
 
-app.use(cors(corsOptions));
-
-// parse requests of content-type - application/json
-app.use(bodyParser.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
+// Connect to database
 const db = require("./app/models");
 db.mongoose
-    .connect(db.url, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-    .then(() => {
-        console.log("Connected to the database!");
-    })
-    .catch(err => {
-        console.log("Cannot connect to the database!", err);
-        process.exit();
-    });
+  .connect(db.url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+  })
+  .then(() => console.log("Connected to the database!"))
+  .catch(err => {
+    console.log("Cannot connect to the database!", err);
+    process.exit();
+  });
 
-const passportConfig = require('./app/config/passport.config');
+// Configure passport for authentication
+var passport = require('./app/config/passport.config');
 app.use(passport.initialize());
 
-// simple route
-app.get("/", (req, res) => {
-    res.json({ message: "Jesus is Lord and Savior." });
-});
-
+// Configure API routes
+app.get("/", res => res.json({ message: "Si Hesus ay Panginoon at Tagapagligtas!" }));
 require("./app/routes/tasks.routes")(app);
 require("./app/routes/auth.routes")(app);
 
-app.use(function(err, req, res, next) {
-    if (err.name = "UnauthorizedError") {
-        res.status(401);
-        res.json({"message": err.name + ": " + err.message});
-    }
+// Implement error handling for UnauthorizedError
+app.use(function(err, res) {
+  if (err.name = "UnauthorizedError") {
+    res.status(401);
+    res.json({ "message": err.name });
+  }
 });
 
-// set port, listen for requests
+// Set port and start listening for requests
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}.`));

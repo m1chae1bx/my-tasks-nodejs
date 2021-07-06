@@ -1,5 +1,5 @@
 {
-  "name": "planner-server",
+  "name": "my-tasks-nodejs",
   "version": "1.0.0",
   "description": "Node.js REST CRUD API with Express and MongoDB",
   "main": "server.js",

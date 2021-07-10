@@ -22,7 +22,13 @@ module.exports = mongoose => {
       required: true
     },
     hash: String,
-    salt: String
+    salt: String,
+    preferences: {
+      defaultList: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User' 
+      }
+    }
   });
 
   /** Schema Methods */

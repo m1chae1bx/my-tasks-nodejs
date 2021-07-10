@@ -14,12 +14,7 @@ app.use(cors(corsOptions));
 // Connect to database
 const db = require("./app/models");
 db.mongoose
-  .connect(db.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  })
+  .connect(db.url, db.options)
   .then(() => console.log("Connected to the database!"))
   .catch(err => {
     console.log("Cannot connect to the database!", err);
@@ -34,6 +29,7 @@ app.use(passport.initialize());
 app.get("/", res => res.json({ message: "Si Hesus ay Panginoon at Tagapagligtas!" }));
 require("./app/routes/tasks.routes")(app);
 require("./app/routes/auth.routes")(app);
+require("./app/routes/list.routes")(app);
 
 // Implement error handling for UnauthorizedError
 app.use(function(err, res) {

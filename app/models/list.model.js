@@ -10,13 +10,13 @@ module.exports = () => {
         timestamps: true,
         toObject: {
           getters: true,
-          transform: function (ret) {
+          transform: function (doc, ret) {
             delete ret._id;
           }
         },
         toJSON: {
           getters: true,
-          transform: function (ret) {
+          transform: function (doc, ret) {
             delete ret._id;
           }
         }

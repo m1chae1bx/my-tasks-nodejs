@@ -95,9 +95,11 @@ exports.login = function(req, res) {
 
 exports.getUserDetails = function(req,res) {
   const id = req.params.id;
+  if (req.user.id !== id) return res.status(401).send({ message: "Unauthorized error" });
 
   User
-    .findById(id)
+    .findById(id, {hash: 0, salt: 0})
+    .populate('preferences.defaultList', ['id', 'name'])
     .then(data => {
       if (!data) {
         res.status(404).send({ message: "User with id " + id + " not found"});
@@ -116,6 +118,8 @@ exports.getUserDetails = function(req,res) {
 exports.delete = function(req, res) {
   const id = req.params.id;
   const password = req.body.password;  
+
+  if (req.user.id !== id) return res.status(401).send({ message: "Unauthorized error" });
 
   // Require password
   if (!password) {
@@ -160,6 +164,9 @@ exports.delete = function(req, res) {
 }
 
 exports.update = (req, res) => {
+  const id = req.params.id;
+  if (req.user.id !== id) return res.status(401).send({ message: "Unauthorized error" });
+
   if (!req.body) {
     return res.status(400).send({ message: 'Data to update cannot be empty' });
   }
@@ -176,7 +183,6 @@ exports.update = (req, res) => {
     });
   }
 
-  const id = req.params.id;
   const newData = {
     fullName: fullName,
     nickname: nickname

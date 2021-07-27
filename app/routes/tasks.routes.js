@@ -3,7 +3,6 @@ module.exports = app => {
   const jwt = require('express-jwt');
   const auth = jwt({
     secret: 'MY_SECRET', // @todo to be set as environment variable instead of hardcoded
-    userProperty: 'payload',
     algorithms: ['HS256'] 
   });
 

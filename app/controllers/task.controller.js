@@ -3,6 +3,8 @@ const Task = db.Task;
 
 // Create and save a new task
 exports.create = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+
   // Validate request
   if (!req.body.name) {
     return res.status(400).send({ message: "Content can not be empty" });
@@ -27,6 +29,8 @@ exports.create = (req, res) => {
 
 // Retrieve tasks from the database
 exports.find = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+  
   const id = req.query.id
   const name = req.query.name;
   const completed = req.query.completed;
@@ -66,7 +70,7 @@ exports.find = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: "Some error occurred while retrieving tasks",
+        message: "An error occurred while retrieving the tasks",
         error: err
       });
     });
@@ -74,6 +78,8 @@ exports.find = (req, res) => {
 
 // Find a single task with an id
 exports.findOne = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+
   const id = req.params.id;
 
   Task
@@ -95,6 +101,9 @@ exports.findOne = (req, res) => {
 
 // Update a Task by the id in the request
 exports.update = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+  // @todo: make sure only tasks owned by user are updated
+
   if (!req.body) {
     return res.status(400).send({ message: "Data to update cannot be empty" });
   }
@@ -120,6 +129,8 @@ exports.update = (req, res) => {
 
 // Delete a Task with the specified id in the request
 exports.delete = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+
   const id = req.params.id;
 
   Task
@@ -139,9 +150,10 @@ exports.delete = (req, res) => {
     }); 
 };
 
-/** For use with multi select */
+/** For use with multi select or for delete account */
 // Delete tasks from the database
 // exports.deleteAll = (req, res) => {
+//   if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
 //   Task
 //     .deleteMany({})
 //     .then(data => {

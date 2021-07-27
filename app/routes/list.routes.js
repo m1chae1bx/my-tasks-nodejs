@@ -3,7 +3,6 @@ module.exports = app => {
   const jwt = require('express-jwt');
   const auth = jwt({
     secret: 'MY_SECRET', // @todo to be set as environment variable instead of hardcoded
-    userProperty: 'payload',
     algorithms: ['HS256'] 
   });
 
@@ -12,8 +11,8 @@ module.exports = app => {
   // Create a new List
   router.post("/", auth, lists.create);
 
-  // // Retrieve all Tasks
-  // router.get("/", auth, tasks.find);
+  // Retrieve Lists owned by user
+  router.get("/", auth, lists.get);
   
   // // Retrieve a single Task with ID
   // router.get("/:id", auth, tasks.findOne);

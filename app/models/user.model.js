@@ -26,7 +26,7 @@ module.exports = mongoose => {
     preferences: {
       defaultList: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User' 
+        ref: 'List' 
       }
     }
   });

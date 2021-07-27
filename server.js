@@ -26,19 +26,22 @@ var passport = require('./app/config/passport.config');
 app.use(passport.initialize());
 
 // Configure API routes
-app.get("/", res => res.json({ message: "Si Hesus ay Panginoon at Tagapagligtas!" }));
 require("./app/routes/tasks.routes")(app);
 require("./app/routes/auth.routes")(app);
 require("./app/routes/list.routes")(app);
 
 // Implement error handling for UnauthorizedError
-app.use(function(err, res) {
+app.use(function(err, req, res, next) {
   if (err.name = "UnauthorizedError") {
-    res.status(401);
-    res.json({ "message": err.name });
+    res.status(401).json({
+      message: "Unauthorized error",
+      error: err
+    });
   }
 });
 
 // Set port and start listening for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}.`));
+
+console.log("God is good!");

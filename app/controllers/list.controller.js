@@ -4,10 +4,13 @@ const List = db.List;
 
 // Create and save a new list
 exports.create = async (req, res) => {
-  // Validate request
+  // Validate request body
   if (!req.body) return res.status(400).send({ message: "Content cannot be empty" });
   if (!req.body.name) return res.status(400).send({ message: "Name is missing" });
   if (!req.body.owner) return res.status(400).send({ message: "Owner is missing" });
+
+  // Check authorization
+  if (req.user.id !== req.body.owner) return res.status(401).send({ message: "Unauthorized error" });
 
   const list = new List({
     name: req.body.name,
@@ -47,3 +50,14 @@ exports.create = async (req, res) => {
   
   session.endSession();
 };
+
+exports.get = (req, res) => {
+  if (!req.user.id) return res.status(401).send({ message: "Unauthorized error" });
+
+  List.find({ owner: db.mongoose.Types.ObjectId(req.user.id)})
+    .then(lists => res.send(lists.map(item => new List(item))))
+    .catch(err => res.status(500).send({
+      message: "An error occured while retrieving the lists",
+      error: err
+    })); 
+}
